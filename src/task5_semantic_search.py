@@ -10,9 +10,14 @@ Yêu cầu:
 """
 
 
+import chromadb
+from pathlib import Path
+from sentence_transformers import SentenceTransformer
+
+
 def semantic_search(query: str, top_k: int = 10) -> list[dict]:
     """
-    Tìm kiếm ngữ nghĩa sử dụng vector similarity.
+    Tìm kiếm ngữ nghĩa sử dụng vector similarity trên ChromaDB.
 
     Args:
         query: Câu truy vấn
@@ -26,37 +31,50 @@ def semantic_search(query: str, top_k: int = 10) -> list[dict]:
         }
         Sorted by score descending.
     """
-    # TODO: Implement semantic search
-    #
-    # Bước 1: Embed query bằng cùng model ở Task 4
-    # Bước 2: Query vector store (cosine similarity)
-    # Bước 3: Return top_k results
-    #
-    # Ví dụ với Weaviate:
-    # import weaviate
-    # from sentence_transformers import SentenceTransformer
-    #
-    # model = SentenceTransformer("BAAI/bge-m3")
-    # query_embedding = model.encode(query).tolist()
-    #
-    # client = weaviate.connect_to_local()
-    # collection = client.collections.get("DrugLawDocs")
-    #
-    # results = collection.query.near_vector(
-    #     near_vector=query_embedding,
-    #     limit=top_k,
-    #     return_metadata=MetadataQuery(distance=True)
-    # )
-    #
-    # return [
-    #     {
-    #         "content": obj.properties["content"],
-    #         "score": 1 - obj.metadata.distance,  # distance → similarity
-    #         "metadata": {"source": obj.properties["source"], ...}
-    #     }
-    #     for obj in results.objects
-    # ]
-    raise NotImplementedError("Implement semantic_search")
+    # 1. Đường dẫn tới DB và kết nối
+    db_path = Path(__file__).parent.parent / "data" / "chromadb"
+    if not db_path.exists():
+        print(f"⚠ ChromaDB chưa được tạo tại {db_path}!")
+        return []
+
+    client = chromadb.PersistentClient(path=str(db_path))
+    
+    try:
+        collection = client.get_collection(name="DrugLawDocs")
+    except Exception as e:
+        print(f"⚠ Không thể lấy collection 'DrugLawDocs': {e}")
+        return []
+
+    # 2. Sinh embedding cho query bằng model giống ở Task 4
+    model_name = "sentence-transformers/all-MiniLM-L6-v2"
+    model = SentenceTransformer(model_name)
+    query_embedding = model.encode(query).tolist()
+
+    # 3. Query collection
+    results = collection.query(
+        query_embeddings=[query_embedding],
+        n_results=top_k
+    )
+
+    # 4. Chuyển đổi khoảng cách cosine sang điểm số tương đồng và định dạng đầu ra
+    formatted_results = []
+    if results and "documents" in results and results["documents"]:
+        documents = results["documents"][0]
+        metadatas = results["metadatas"][0]
+        distances = results["distances"][0]
+
+        for doc, meta, dist in zip(documents, metadatas, distances):
+            # similarity = 1 - cosine_distance
+            score = 1.0 - float(dist)
+            formatted_results.append({
+                "content": doc,
+                "score": score,
+                "metadata": meta
+            })
+
+    # 5. Sắp xếp giảm dần theo score
+    formatted_results.sort(key=lambda x: x["score"], reverse=True)
+    return formatted_results[:top_k]
 
 
 if __name__ == "__main__":
@@ -64,3 +82,4 @@ if __name__ == "__main__":
     results = semantic_search("hình phạt cho tội tàng trữ ma tuý", top_k=5)
     for r in results:
         print(f"[{r['score']:.3f}] {r['content'][:100]}...")
+

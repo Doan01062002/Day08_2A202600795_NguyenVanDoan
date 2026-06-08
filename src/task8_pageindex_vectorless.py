@@ -18,6 +18,7 @@ Hướng dẫn:
 """
 
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -26,27 +27,53 @@ load_dotenv()
 PAGEINDEX_API_KEY = os.getenv("PAGEINDEX_API_KEY", "")
 STANDARDIZED_DIR = Path(__file__).parent.parent / "data" / "standardized"
 
+# Tương thích với các phiên bản SDK của pageindex (0.1.x và 0.2.x)
+try:
+    from pageindex import PageIndex
+    SDK_VERSION = "old"
+except ImportError:
+    try:
+        from pageindex import PageIndexClient as PageIndex
+        SDK_VERSION = "new"
+    except ImportError:
+        PageIndex = None
+        SDK_VERSION = "none"
+
+_pageindex_disabled = False
+
 
 def upload_documents():
     """
     Upload toàn bộ markdown documents lên PageIndex.
     """
-    # TODO: Implement upload
-    #
-    # Tham khảo: https://github.com/VectifyAI/PageIndex
-    #
-    # from pageindex import PageIndex
-    #
-    # pi = PageIndex(api_key=PAGEINDEX_API_KEY)
-    #
-    # for md_file in STANDARDIZED_DIR.rglob("*.md"):
-    #     content = md_file.read_text(encoding="utf-8")
-    #     pi.upload(
-    #         content=content,
-    #         metadata={"filename": md_file.name, "type": md_file.parent.name}
-    #     )
-    #     print(f"  ✓ Uploaded: {md_file.name}")
-    raise NotImplementedError("Implement upload_documents")
+    if not PAGEINDEX_API_KEY or PAGEINDEX_API_KEY == "pi_xxx":
+        raise ValueError("PAGEINDEX_API_KEY is not configured in .env")
+
+    if SDK_VERSION == "none":
+        raise ValueError("pageindex SDK is not installed")
+
+    pi = PageIndex(api_key=PAGEINDEX_API_KEY)
+    success_count = 0
+
+    for md_file in STANDARDIZED_DIR.rglob("*.md"):
+        try:
+            if SDK_VERSION == "old":
+                content = md_file.read_text(encoding="utf-8")
+                pi.upload(
+                    content=content,
+                    metadata={"filename": md_file.name, "type": md_file.parent.name}
+                )
+            else:
+                # SDK mới (PageIndexClient) yêu cầu file_path
+                pi.submit_document(file_path=str(md_file))
+                
+            print(f"  [OK] Uploaded: {md_file.name}")
+            success_count += 1
+        except Exception as e:
+            # Dùng tiếng Anh không dấu tránh UnicodeEncodeError trên Windows CMD/Powershell
+            print(f"  [ERROR] Error uploading {md_file.name}: {e}")
+
+    print(f"[OK] Completed uploading {success_count} documents to PageIndex.")
 
 
 def pageindex_search(query: str, top_k: int = 5) -> list[dict]:
@@ -66,34 +93,74 @@ def pageindex_search(query: str, top_k: int = 5) -> list[dict]:
             'source': 'pageindex'   # Đánh dấu nguồn retrieval
         }
     """
-    # TODO: Implement PageIndex query
-    #
-    # from pageindex import PageIndex
-    #
-    # pi = PageIndex(api_key=PAGEINDEX_API_KEY)
-    # results = pi.query(query=query, top_k=top_k)
-    #
-    # return [
-    #     {
-    #         "content": r.text,
-    #         "score": r.score,
-    #         "metadata": r.metadata,
-    #         "source": "pageindex"
-    #     }
-    #     for r in results
-    # ]
-    raise NotImplementedError("Implement pageindex_search")
+    global _pageindex_disabled
+    if not PAGEINDEX_API_KEY or PAGEINDEX_API_KEY == "pi_xxx" or _pageindex_disabled:
+        raise ValueError("PAGEINDEX_API_KEY is not configured in .env or PageIndex is disabled")
+
+    if SDK_VERSION == "none":
+        raise ValueError("pageindex SDK is not installed")
+
+    pi = PageIndex(api_key=PAGEINDEX_API_KEY)
+    
+    try:
+        if SDK_VERSION == "old":
+            results = pi.query(query=query, top_k=top_k)
+            formatted_results = []
+            for r in results:
+                content = getattr(r, "text", getattr(r, "content", None))
+                if content is None:
+                    content = str(r)
+                    
+                score = float(getattr(r, "score", 0.5))
+                metadata = getattr(r, "metadata", {})
+                
+                formatted_results.append({
+                    "content": content,
+                    "score": score,
+                    "metadata": metadata,
+                    "source": "pageindex"
+                })
+            return formatted_results
+        else:
+            # SDK mới sử dụng chat_completions để lấy kết quả retrieval
+            try:
+                response = pi.chat_completions(
+                    messages=[{"role": "user", "content": f"Retrieve information for: {query}"}],
+                    temperature=0.3
+                )
+                answer = response["choices"][0]["message"]["content"]
+                return [{
+                    "content": answer,
+                    "score": 0.9,
+                    "metadata": {"source": "pageindex_api"},
+                    "source": "pageindex"
+                }]
+            except Exception as e:
+                print(f"  [WARNING] PageIndex chat_completions failed: {e}")
+                raise e
+    except Exception as e:
+        print(f"  [WARNING] PageIndex query error: {e}. Disabling PageIndex fallback.")
+        _pageindex_disabled = True
+        raise e
 
 
 if __name__ == "__main__":
-    if not PAGEINDEX_API_KEY:
-        print("⚠ Hãy set PAGEINDEX_API_KEY trong file .env")
-        print("  Đăng ký tại: https://pageindex.ai/")
-    else:
-        print("Uploading documents...")
-        upload_documents()
+    # Đặt encoding mặc định cho stdout để in ký tự Unicode an toàn trên Windows
+    if sys.platform.startswith("win"):
+        import io
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
-        print("\nTest query:")
-        results = pageindex_search("hình phạt sử dụng ma tuý", top_k=3)
-        for r in results:
-            print(f"[{r['score']:.3f}] {r['content'][:100]}...")
+    if not PAGEINDEX_API_KEY or PAGEINDEX_API_KEY == "pi_xxx":
+        print("[WARNING] Please set PAGEINDEX_API_KEY in your .env file.")
+        print("  Register at: https://pageindex.ai/")
+    else:
+        try:
+            print("Uploading documents...")
+            upload_documents()
+
+            print("\nTest query:")
+            results = pageindex_search("hinh phat su dung ma tuy", top_k=3)
+            for r in results:
+                print(f"[{r['score']:.3f}] {r['content'][:100]}...")
+        except Exception as e:
+            print(f"[ERROR] Exec failed: {e}")
