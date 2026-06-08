@@ -14,6 +14,7 @@ Hướng dẫn:
 """
 
 import json
+import sys
 from pathlib import Path
 
 from markitdown import MarkItDown
@@ -37,9 +38,9 @@ def convert_legal_docs():
                 result = md.convert(str(filepath))
                 output_path = output_dir / f"{filepath.stem}.md"
                 output_path.write_text(result.text_content, encoding="utf-8")
-                print(f"  ✓ Saved: {output_path}")
+                print(f"  [OK] Saved: {output_path.name}")
             except Exception as e:
-                print(f"  ✗ Error converting {filepath.name}: {e}")
+                print(f"  [ERROR] Error converting {filepath.name}: {e}")
 
 
 def convert_news_articles():
@@ -62,10 +63,9 @@ def convert_news_articles():
 
                 content = header + data.get("content_markdown", "")
                 output_path.write_text(content, encoding="utf-8")
-                print(f"  ✓ Saved: {output_path}")
+                print(f"  [OK] Saved: {output_path.name}")
             except Exception as e:
-                print(f"  ✗ Error converting {filepath.name}: {e}")
-
+                print(f"  [ERROR] Error converting {filepath.name}: {e}")
 
 
 def convert_all():
@@ -80,8 +80,13 @@ def convert_all():
     print("\n--- News Articles ---")
     convert_news_articles()
 
-    print("\n✓ Done! Output tại:", OUTPUT_DIR)
+    print("\n[OK] Done! Output path:", OUTPUT_DIR)
 
 
 if __name__ == "__main__":
+    # Đặt stdout về UTF-8 để in tiếng Việt an toàn trên Windows
+    if sys.platform.startswith("win"):
+        import io
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+        
     convert_all()

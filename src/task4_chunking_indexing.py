@@ -29,6 +29,7 @@ Cài đặt:
 from pathlib import Path
 
 import os
+import sys
 from pathlib import Path
 import chromadb
 from chromadb.config import Settings
@@ -82,9 +83,9 @@ def load_documents() -> list[dict]:
                 "content": content,
                 "metadata": {"source": md_file.name, "type": doc_type}
             })
-            print(f"  ✓ Loaded document: {md_file.name} (type: {doc_type})")
+            print(f"  [OK] Loaded document: {md_file.name} (type: {doc_type})")
         except Exception as e:
-            print(f"  ✗ Error reading {md_file.name}: {e}")
+            print(f"  [ERROR] Error reading {md_file.name}: {e}")
             
     return documents
 
@@ -156,8 +157,15 @@ def index_to_vectorstore(chunks: list[dict]):
     # Khởi tạo persistent client lưu trữ dữ liệu tại data/chromadb/
     client = chromadb.PersistentClient(path=str(db_path))
     
-    # Tạo hoặc lấy collection
-    collection = client.get_or_create_collection(
+    # Xóa collection cũ để tránh lẫn lộn dữ liệu tiếng Anh mẫu cũ
+    try:
+        client.delete_collection(name="DrugLawDocs")
+        print("Dropped existing collection 'DrugLawDocs'")
+    except Exception:
+        pass
+        
+    # Tạo collection mới sạch sẽ
+    collection = client.create_collection(
         name="DrugLawDocs",
         metadata={"hnsw:space": "cosine"}
     )
@@ -176,7 +184,7 @@ def index_to_vectorstore(chunks: list[dict]):
         metadatas=metadatas,
         ids=ids
     )
-    print("✓ Indexing hoàn tất!")
+    print("[OK] Indexing hoan tat!")
 
 
 def run_pipeline():
@@ -189,18 +197,23 @@ def run_pipeline():
     print("=" * 50)
 
     docs = load_documents()
-    print(f"\n✓ Loaded {len(docs)} documents")
+    print(f"\n[OK] Loaded {len(docs)} documents")
 
     chunks = chunk_documents(docs)
-    print(f"✓ Created {len(chunks)} chunks")
+    print(f"[OK] Created {len(chunks)} chunks")
 
     chunks = embed_chunks(chunks)
-    print(f"✓ Embedded {len(chunks)} chunks")
+    print(f"[OK] Embedded {len(chunks)} chunks")
 
     index_to_vectorstore(chunks)
-    print("✓ Indexed to vector store")
+    print("[OK] Indexed to vector store")
 
 
 if __name__ == "__main__":
+    # Đặt stdout về UTF-8 để in tiếng Việt an toàn trên Windows
+    if sys.platform.startswith("win"):
+        import io
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+        
     run_pipeline()
 

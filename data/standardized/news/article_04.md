@@ -1,28 +1,12 @@
-# Triều Tiên phóng tên lửa đạn đạo, Nhật phát lệnh sơ tán khẩn
+# Cựu diễn viên Lệ Hằng 'Đất và Người' bị bắt vì buôn bán ma túy
 
 **Source:** https://vnexpress.net/cuu-dien-vien-le-hang-bi-khoi-to-vi-mua-ban-ma-tuy-4592780.html
-**Crawled:** 2026-06-08T11:36:01.228851
+**Crawled:** 2026-06-08T15:37:36.483226
 
 ---
 
-Triều Tiên phóng tên lửa ra biển, khiến chính phủ Nhật phát thông báo khẩn yêu cầu người dân Hokkaido sơ tán đến nơi trú ẩn an toàn.
+Cơ quan Cảnh sát điều tra Công an quận Đống Đa (Hà Nội) đã ra quyết định khởi tố vụ án, khởi tố bị can đối với Bùi Thị Lệ Hằng (48 tuổi, cựu diễn viên nổi tiếng) về tội 'Mua bán trái phép chất ma túy' theo quy định tại Điều 251 Bộ luật Hình sự.
 
-Hội đồng Tham mưu trưởng Liên quân Hàn Quốc cho biết Triều Tiên phóng tên lửa đạn đạo ra vùng biển phía đông bán đảo sáng nay, nhưng chưa công bố thông tin chi tiết như chủng loại, tầm bay và độ cao của quả đạn.
+Trước đó, vào khoảng 20h10 ngày 10/3/2023, trong quá trình tuần tra kiểm soát trên địa bàn, lực lượng Công an phường Khâm Thiên (quận Đống Đa) đã bắt quả tang Lệ Hằng đang có hành vi giao dịch, mua bán chất cấm. Lực lượng chức năng thu giữ tại chỗ 0,696 gam ma túy tổng hợp dạng đá. Tại cơ quan điều tra, Lệ Hằng khai nhận mua số ma túy trên với giá 500.000 đồng để bán lại cho khách kiếm lời. Kết quả xét nghiệm nước tiểu cho thấy cựu diễn viên âm tính với ma túy.
 
-Văn phòng Thủ tướng Nhật Bản cũng xác nhận thông tin, nói rằng Bình Nhưỡng "dường như đã phóng tên lửa đạn đạo".
-
-Hệ thống cảnh báo khẩn cấp J-Alert của Nhật Bản phát lệnh sơ tán đến người dân đảo cực bắc Hokkaido, yêu cầu họ lập tức tìm nơi trú ẩn an toàn trong các công trình kiên cố hoặc hầm ngầm vì nguy cơ mảnh tên lửa rơi xuống hòn đảo này. Tokyo cũng cảnh báo máy bay hoạt động ở khu vực quanh Hokkaido về nguy cơ mảnh vỡ tên lửa rơi xuống.
-
-Chính phủ Nhật Bản sau đó thông báo tên lửa không còn khả năng rơi xuống Hokkaido và dỡ bỏ lệnh sơ tán tại khu vực, trước khi Cảnh sát biển Nhật Bản tuyên bố tên lửa đã lao xuống biển.
-
-Triều Tiên chưa bình luận về thông tin.
-
-Hãng thông tấn trung ương Triều Tiên KCNA cho biết lãnh đạo Kim Jong-un hôm 10/4 tham dự cuộc họp mở rộng của Quân ủy Trung ương, ra lệnh tăng cường hơn nữa khả năng răn đe chiến tranh của đất nước với "tốc độ ngày càng tăng" và theo cách "thực tế, quyết liệt hơn".
-
-Triều Tiêncáo buộc Mỹ và Hàn Quốc đang có "những động thái leo thang nhằm phát động cuộc chiến tranh xâm lược" khi đề cập đến loạt cuộc tập trận chung gần đây, nhấn mạnh những hoạt động này chuẩn bị cho cuộc chiến tổng lực và buộc Bình Nhưỡng xem xét đến "hành động thực tế mạnh mẽ", trong đó có biện pháp quân sự.
-
-Mỹ,Nhật Bảnvà Hàn Quốc hồi đầu tháng cũng diễn tập hải quân chung với nội dung săn ngầm và tìm kiếm cứu hộ. Mỹ cử tàu sân bay USS Nimitz, cùng tàu khu trục USS Wayne E. Meyer và USS Decatur tham gia. Hàn Quốc triển khai các tàu khu trục Yulgok YiYi, Choe Yeong, Daejoyeong và tàu hậu cần Soyang, còn Nhật Bản huy động tàu khu trục JS Umigiri.
-
-Lần gần nhất Mỹ, Nhật Bản và Hàn Quốc diễn tập chống ngầm chung là tháng 9/2022. Đây cũng là lần diễn tập tìm kiếm cứu hộ chung đầu tiên giữa ba nước trong 7 năm.
-
-Vũ Anh(TheoReuters, AFP)
+Lệ Hằng từng là một diễn viên tài năng và rất nổi tiếng của màn ảnh phía Bắc vào những năm 1990 và đầu 2000. Vai diễn để đời của cô là nhân vật Hoài 'Thatcher' ngổ ngáo, cá tính trong bộ phim truyền hình kinh điển 'Đất và Người'. Sau khi rời bỏ nghệ thuật vào năm 2012, Lệ Hằng sống khép kín và bất ngờ sa ngã vào con đường phạm pháp buôn bán cái chết trắng.
